@@ -1,5 +1,6 @@
 import React, { forwardRef, HTMLAttributes } from 'react';
 import { cx, css } from 'emotion';
+import tinycolor from 'tinycolor2';
 import { GrafanaTheme } from '@grafana/data';
 import { useTheme } from '../../themes';
 import { getTagColor, getTagColorsFromName } from '../../utils';
@@ -38,21 +39,33 @@ const getTagStyles = (theme: GrafanaTheme, name: string, colorIndex?: number) =>
   } else {
     colors = getTagColor(colorIndex);
   }
+
+  let hoverColor;
+  if (theme.isDark) {
+    hoverColor = tinycolor(colors.color)
+      .darken()
+      .toHexString();
+  } else {
+    hoverColor = tinycolor(colors.color)
+      .lighten()
+      .toHexString();
+  }
+
   return {
     wrapper: css`
-      font-weight: ${theme.typography.weight.semibold};
+      font-weight: ${theme.typography.weight.bold};
       font-size: ${theme.typography.size.sm};
-      line-height: ${theme.typography.lineHeight.xs};
+      line-height: 16px;
       vertical-align: baseline;
       background-color: ${colors.color};
       color: ${theme.palette.gray98};
       white-space: nowrap;
       text-shadow: none;
-      padding: 3px 6px;
-      border-radius: ${theme.border.radius.md};
+      padding: 4px 8px;
+      border-radius: ${theme.border.radius.sm};
 
       :hover {
-        opacity: 0.85;
+        background-color: ${hoverColor};
         cursor: pointer;
       }
     `,

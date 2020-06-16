@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { css } from 'emotion';
+import tinycolor from 'tinycolor2';
 import { getTagColorsFromName } from '../../utils';
 import { stylesFactory, useTheme } from '../../themes';
 import { Icon } from '../Icon/Icon';
@@ -12,26 +13,42 @@ interface Props {
 }
 
 const getStyles = stylesFactory(({ theme, name }: { theme: GrafanaTheme; name: string }) => {
-  const { color, borderColor } = getTagColorsFromName(name);
-
+  const { color } = getTagColorsFromName(name);
+  let hoverColor;
+  if (theme.isDark) {
+    hoverColor = tinycolor(color)
+      .darken()
+      .toHexString();
+  } else {
+    hoverColor = tinycolor(color)
+      .lighten()
+      .toHexString();
+  }
   return {
     itemStyle: css`
+      font-weight: ${theme.typography.weight.bold};
+      font-size: ${theme.typography.size.sm};
+      line-height: 16px;
+      vertical-align: baseline;
       background-color: ${color};
-      color: ${theme.palette.white};
-      border: 1px solid ${borderColor};
-      border-radius: 3px;
-      padding: 3px 6px;
-      margin: 3px;
+      color: ${theme.palette.gray98};
       white-space: nowrap;
       text-shadow: none;
-      font-weight: 500;
-      line-height: 14px;
-      display: flex;
-      align-items: center;
+      padding: 4px 8px;
+      border-radius: ${theme.border.radius.sm};
+
+      :hover {
+        background-color: ${hoverColor};
+        cursor: pointer;
+      }
     `,
 
     nameStyle: css`
       margin-right: 3px;
+    `,
+
+    iconStyle: css`
+      margin-bottom: 0;
     `,
   };
 });
@@ -43,7 +60,7 @@ export const TagItem: FC<Props> = ({ name, onRemove }) => {
   return (
     <div className={styles.itemStyle}>
       <span className={styles.nameStyle}>{name}</span>
-      <Icon name="times" onClick={() => onRemove(name)} />
+      <Icon className={styles.iconStyle} name="times" onClick={() => onRemove(name)} />
     </div>
   );
 };
